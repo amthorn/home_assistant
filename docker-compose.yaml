@@ -1,0 +1,28 @@
+version: '3'
+services:
+  homeassistant:
+    container_name: homeassistant
+    image: "ghcr.io/home-assistant/home-assistant:stable"
+    volumes:
+      - ./ha_configs:/config
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /dev/serial/by-id:/dev/serial/by-id
+      - /run/dbus:/run/dbus:ro
+    restart: unless-stopped
+    privileged: true
+    network_mode: host
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - UMASK=007
+    devices:
+      - "/dev/ttyACM0:/dev/ttyACM0"
+  mqtt:
+    image: eclipse-mosquitto
+    restart: always
+    network_mode: host
+    volumes:
+      - ./storage/mosquitto/config:/mosquitto/config
+      - ./storage/mosquitto/data:/mosquitto/data
+      - ./storage/mosquitto/log:/mosquitto/log
